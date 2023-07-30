@@ -88,7 +88,8 @@ void updatePDF(int start, int end, GaussianPDF* distribution, const GaussianPDF*
 
 void selcetReliablePDF(int start, int end, GaussianPDF* measurePDF, float* input, float sigmaBoundary)
 {
-	//기존 분포에서, 입력이 몇 시그마에 해당되는 지 찾기
+	//기존 분포에서, 입력이 몇 시그마에 해당되는 지 찾기 (X)
+#if 0
 	std::vector<float> inSigmaVec;
 	int num = end - start;
 	for (int i = start; i < end; i++)
@@ -112,6 +113,29 @@ void selcetReliablePDF(int start, int end, GaussianPDF* measurePDF, float* input
 			sigma_dash = sigmaPDF.mean - inSigmaVec[i] / sigmaPDF.sigma;
 
 		if (abs(sigma_dash) <= sigmaBoundary )
+			(measurePDF + i + start)->unReliable = 0;
+		else
+			(measurePDF + i + start)->unReliable = 1;
+	}
+#endif
+
+	std::vector<float> diffVec;
+	int num = end - start;
+	for (int i = start; i < end; i++)
+	{
+		diffVec.push_back( (measurePDF + i)->mean - *(input + i));
+	}
+
+	GaussianPDF diffPDF = calcGaussianPDF(diffVec);
+
+	//시그마의 분포에서, 시그마바운더리 내에 오는 분포만 enable하기
+	for (int i = 0; i < num; i++)
+	{
+		float sigma_dash = 0;
+		if (diffPDF.sigma != 0)
+			sigma_dash = getSigmaInPDF(&diffPDF, diffVec[i]);
+
+		if (abs(sigma_dash) <= sigmaBoundary)
 			(measurePDF + i + start)->unReliable = 0;
 		else
 			(measurePDF + i + start)->unReliable = 1;
