@@ -118,7 +118,27 @@ void selcetReliablePDF(int start, int end, GaussianPDF* measurePDF, float* input
 			(measurePDF + i + start)->unReliable = 1;
 	}
 #endif
+	int num = end - start;
+	double sigmaSum = 0;
+	for (int i = start; i < end; i++)
+	{
+		double sigma_dash = getSigmaInPDF(measurePDF + i, input[i]);
+		if (abs(sigma_dash) < 1)
+			(measurePDF + i + start)->unReliable = 0;
+		else
+			(measurePDF + i + start)->unReliable = 1;
 
+		sigmaSum += sigma_dash;
+	}
+
+	if (sigmaSum / (float)num < 1)
+		return;
+
+#if 1
+	for(int i = start; i < end ; i++)
+		(measurePDF + i + start)->unReliable = 0;
+#endif
+#if 0
 	std::vector<float> diffVec;
 	int num = end - start;
 	for (int i = start; i < end; i++)
@@ -128,7 +148,7 @@ void selcetReliablePDF(int start, int end, GaussianPDF* measurePDF, float* input
 
 	GaussianPDF diffPDF = calcGaussianPDF(diffVec);
 
-	//시그마의 분포에서, 시그마바운더리 내에 오는 분포만 enable하기
+	//직전값 차이의 분포에서, 시그마바운더리 내에 오는 분포만 enable하기
 	for (int i = 0; i < num; i++)
 	{
 		float sigma_dash = 0;
@@ -140,6 +160,7 @@ void selcetReliablePDF(int start, int end, GaussianPDF* measurePDF, float* input
 		else
 			(measurePDF + i + start)->unReliable = 1;
 	}
+#endif
 }
 
 void selcetValidNoisePDF(int num, GaussianPDF* noise, float sigmaBoundary, bool* outEnableTable)
