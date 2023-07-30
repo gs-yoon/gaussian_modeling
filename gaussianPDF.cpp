@@ -131,7 +131,7 @@ void selcetReliablePDF(int start, int end, GaussianPDF* measurePDF, float* input
 		sigmaSum += sigma_dash;
 	}
 
-	if (sigmaSum / (float)num < 1)
+	if ( (sigmaSum / (float)num) < 1)
 		return;
 
 #if 1
