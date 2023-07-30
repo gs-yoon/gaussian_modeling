@@ -8,13 +8,13 @@
 
 void printPDF(GaussianPDF* distribution)
 {
-	std::cout << "mean = " << distribution->mean << ", sigam = " << distribution->sigma << "\n";
+	std::cout << "mean = " << distribution->mean << ", sigma = " << distribution->sigma << "\n";
 }
 
 void printAll(int start, int end, GaussianPDF* distribution)
 {
 	for (int i = 0; i < 10; i++)
-		std::cout << i <<": mean = " << (distribution+i)->mean << ", sigam = " << (distribution+i)->sigma << "\n";
+		std::cout << i <<": mean = " << (distribution+i)->mean << ", sigma = " << (distribution+i)->sigma << "\n";
 }
 
 double generateGaussian(float mean, float sigma) {
@@ -97,7 +97,7 @@ int main()
 	GaussianPDF measurModel[10];
 	memset(measurModel, 0, sizeof(struct GaussianPDF) * 10 );
 
-	selcetReliablePDF(10, measurModel, input, 1);
+	selcetReliablePDF(0, sizeof(measurModel) / sizeof(GaussianPDF), measurModel, input, 1);
 	for (int i = 0; i < 10; i++)
 		addMeasurment(measurModel + i, noiseModel + i, input[i]);
 	
@@ -117,7 +117,7 @@ int main()
 
 	//get measure model2
 
-	selcetReliablePDF(10, measurModel, input_2, 1);
+	selcetReliablePDF(0, sizeof(measurModel) / sizeof(GaussianPDF), measurModel, input_2, 1);
 	for (int i = 0; i < 10; i++)
 		addMeasurment(measurModel + i, noiseModel + i, input_2[i]);
 

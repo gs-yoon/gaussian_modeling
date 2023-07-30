@@ -12,6 +12,7 @@ double calcGaussianMean(const std::vector<float> &errors)
 	mean = sum / errors.size();
 	return mean;
 }
+
 double calcGaussianSigma(double mean, const std::vector<float> &errors)
 {
 	double sum=0;
@@ -85,11 +86,12 @@ void updatePDF(int start, int end, GaussianPDF* distribution, const GaussianPDF*
 }
 
 
-void selcetReliablePDF(int num, GaussianPDF* measurePDF, float* input, float sigmaBoundary)
+void selcetReliablePDF(int start, int end, GaussianPDF* measurePDF, float* input, float sigmaBoundary)
 {
 	//기존 분포에서, 입력이 몇 시그마에 해당되는 지 찾기
 	std::vector<float> inSigmaVec;
-	for (int i = 0; i < num; i++)
+	int num = end - start;
+	for (int i = start; i < end; i++)
 	{
 			inSigmaVec.push_back(getSigmaInPDF(measurePDF + i, *(input + i)));
 	}
@@ -110,9 +112,9 @@ void selcetReliablePDF(int num, GaussianPDF* measurePDF, float* input, float sig
 			sigma_dash = sigmaPDF.mean - inSigmaVec[i] / sigmaPDF.sigma;
 
 		if (abs(sigma_dash) <= sigmaBoundary )
-			(measurePDF + i)->unReliable = 0;
+			(measurePDF + i + start)->unReliable = 0;
 		else
-			(measurePDF + i)->unReliable = 1;
+			(measurePDF + i + start)->unReliable = 1;
 	}
 }
 
